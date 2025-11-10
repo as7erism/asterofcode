@@ -1,0 +1,72 @@
+use core::panic;
+use std::{env, fs};
+
+use clap::Parser;
+use dotenvy::dotenv;
+
+mod year2025;
+
+const URL: &'static str = "https://adventofcode.com";
+
+/// collection of aster's advent of code solutions
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    #[arg(value_parser = clap::value_parser!(u8).range(1..13))]
+    day: u8,
+
+    #[arg(
+        short,
+        long,
+        default_value_t = 2025,
+        value_parser = clap::value_parser!(u16).range(2025..2026)
+    )]
+    year: u16,
+
+    #[arg(
+        short,
+        long,
+        value_parser = clap::value_parser!(u8).range(1..3)
+    )]
+    part: Option<u8>,
+
+    #[arg(short, long)]
+    input: Option<String>,
+
+    #[arg(short, long)]
+    file: Option<String>,
+
+    #[arg(short, long)]
+    session_id: Option<String>,
+}
+
+fn main() {
+    let _ = dotenv();
+    let args = Args::parse();
+
+    let input = if let Some(input) = args.input {
+        input
+    } else if let Some(path) = args.file {
+        fs::read_to_string(&path)
+            .expect(&format!("error reading input file {path}"))
+    } else {
+        let session_id = args.session_id.unwrap_or_else(|| {
+            env::var("SESSION_ID").expect("no input given and no session id to fetch input given")
+        });
+
+        reqwest::blocking::Client::new()
+            .get(format!("{URL}/{}/day/{}/input", args.year, args.day))
+            .header("Cookie", format!("session={session_id}"))
+            .send()
+            .expect("no input given and failed to complete http request for input")
+            .error_for_status()
+            .expect("no input given and http request failed\n\tis your session id valid?")
+            .text()
+            .expect("no input given and failed to parse http response")
+    };
+
+    match args.year {
+        2025 => year2025::run(args.day, args.part, &input),
+        _ => panic!("haven't done this year yet..."),
+    }
+}
