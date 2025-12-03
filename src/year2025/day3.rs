@@ -55,7 +55,7 @@ fn part_two(input: &str) {
                     // pick a battery from a range such that even if we pick the last battery in
                     // the range, there will be enough batteries after to fill all our slots
                     let battery = choose_battery(
-                        &bank[i..=(i + bank[i..].len() - (JOLTAGE_BATTERIES - joltage.len()))],
+                        &bank[i..=(bank.len() - (JOLTAGE_BATTERIES - joltage.len()))],
                     );
 
                     joltage.push(bank[i + battery]);
@@ -64,7 +64,7 @@ fn part_two(input: &str) {
                 }
 
                 // if we short-circuited because we couldn't make any more choices, add the rest of
-                // the batteries to the joltage
+                // the batteries to the joltage here
                 if JOLTAGE_BATTERIES > joltage.len() {
                     joltage.push_str(&String::from_iter(&bank[i..]));
                 }
@@ -79,10 +79,9 @@ fn choose_battery(slice: &[char]) -> usize {
     slice
         .iter()
         .enumerate()
-        // we want the max, but `.max()` and its ilk return the last element that
-        // matches, which means our second partition would be unnecessarily small.
-        // `.min()` and company return the first, so use that and reverse the
-        // comparison order
+        // we want the max, but `.max()` and its ilk return the last element that matches, which
+        // means our second partition would be unnecessarily small. `.min()` and company return the
+        // first, so use that and reverse the comparison order
         .min_by(|(_, x), (_, y)| y.cmp(x))
         .map(|(i, _)| i)
         .unwrap()
