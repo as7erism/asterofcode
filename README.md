@@ -13,14 +13,14 @@ to run both parts of a given day:
 
 where `<INPUT_FILE>` is the name of a file containing your puzzle input.
 
-
-
 you can also have your puzzle input fetched dynamically by creating a `.env` file that sets the `SESSION_ID` variable:
 
 ```
 SESSION_ID=<YOUR_SESSION_ID>
 ```
 
-where `<YOUR_SESSION_ID>` is the session token passed as a cookie in your requests to <https://adventofcode.com>. this can also be passed as a regular environment variable or via the `--session-id` option.
+where `<YOUR_SESSION_ID>` is the session token passed as a cookie in your requests to <https://adventofcode.com>. this can also be passed as a regular environment variable or via the `--session-id` option. then, you can omit the input file:
+
+`cargo run -- <DAY>`
 
 for more options, run `cargo run -- --help`.

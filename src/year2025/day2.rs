@@ -59,17 +59,19 @@ fn is_valid(id: u64) -> bool {
 fn is_valid_2(id: u64) -> bool {
     // for each factor of this id, chop off that number of digits from the end of a running total
     // and see if each chopped off collection of digits match. if they all do, this is invalid!
-    (0..=(id.num_digits() as u32 / 2)).filter(|factor| id.num_digits().is_multiple_of(*factor as u64)).all(|factor| {
-        let rightmost = id % 10_u64.pow(factor);
-        let mut state = id / 10_u64.pow(factor);
+    (0..=(id.num_digits() as u32 / 2))
+        .filter(|factor| id.num_digits().is_multiple_of(*factor as u64))
+        .all(|factor| {
+            let rightmost = id % 10_u64.pow(factor);
+            let mut state = id / 10_u64.pow(factor);
 
-        while state != 0 {
-            if state % 10_u64.pow(factor) != rightmost {
-                return true;
+            while state != 0 {
+                if state % 10_u64.pow(factor) != rightmost {
+                    return true;
+                }
+                state /= 10_u64.pow(factor);
             }
-            state /= 10_u64.pow(factor);
-        }
 
-        false
-    })
+            false
+        })
 }
