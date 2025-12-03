@@ -47,8 +47,7 @@ fn main() {
     let input = if let Some(input) = args.input {
         input
     } else if let Some(path) = args.file {
-        fs::read_to_string(&path)
-            .expect(&format!("error reading input file {path}"))
+        fs::read_to_string(&path).expect(&format!("error reading input file {path}"))
     } else {
         let session_id = args.session_id.unwrap_or_else(|| {
             env::var("SESSION_ID").expect("no input given and no session id to fetch input given")
