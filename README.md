@@ -19,7 +19,7 @@ you can also have your puzzle input fetched dynamically by creating a `.env` fil
 SESSION_ID=<YOUR_SESSION_ID>
 ```
 
-where `<YOUR_SESSION_ID>` is the session token passed as a cookie in your requests to <https://adventofcode.com>. this can also be passed as a regular environment variable or via the `--session-id` option. then, you can omit the input file:
+where `<YOUR_SESSION_ID>` is the session token sent as a cookie in your requests to <https://adventofcode.com>. this can also be passed as a regular environment variable or via the `--session-id` option. then, you can omit the input file:
 
 `cargo run -- <DAY>`
 
