@@ -1,53 +1,41 @@
 use aoc::NumDigits;
 
-pub fn run(part: Option<u8>, input: &str) {
-    match part {
-        Some(p) => {
-            if p == 1 {
-                part_one(input);
-            } else {
-                part_two(input);
-            }
-        }
-        None => {
-            part_one(input);
-            part_two(input);
-        }
+pub struct Solution;
+
+impl crate::Solution for Solution {
+    fn part_one(input: &str) {
+        println!(
+            "{}",
+            input
+                .split(',')
+                .map(|range| {
+                    let bounds = range
+                        .split('-')
+                        .map(|id| id.trim().parse::<u64>().unwrap())
+                        .collect::<Vec<u64>>();
+                    (bounds[0]..(bounds[1] + 1)).filter(|id| !is_valid(*id))
+                })
+                .flatten()
+                .sum::<u64>()
+        );
     }
-}
 
-fn part_one(input: &str) {
-    println!(
-        "{}",
-        input
-            .split(',')
-            .map(|range| {
-                let bounds = range
-                    .split('-')
-                    .map(|id| id.trim().parse::<u64>().unwrap())
-                    .collect::<Vec<u64>>();
-                (bounds[0]..(bounds[1] + 1)).filter(|id| !is_valid(*id))
-            })
-            .flatten()
-            .sum::<u64>()
-    );
-}
-
-fn part_two(input: &str) {
-    println!(
-        "{}",
-        input
-            .split(',')
-            .map(|range| {
-                let bounds = range
-                    .split('-')
-                    .map(|id| id.trim().parse::<u64>().unwrap())
-                    .collect::<Vec<u64>>();
-                (bounds[0]..=bounds[1]).filter(|id| !is_valid_2(*id))
-            })
-            .flatten()
-            .sum::<u64>()
-    );
+    fn part_two(input: &str) {
+        println!(
+            "{}",
+            input
+                .split(',')
+                .map(|range| {
+                    let bounds = range
+                        .split('-')
+                        .map(|id| id.trim().parse::<u64>().unwrap())
+                        .collect::<Vec<u64>>();
+                    (bounds[0]..=bounds[1]).filter(|id| !is_valid_2(*id))
+                })
+                .flatten()
+                .sum::<u64>()
+        );
+    }
 }
 
 fn is_valid(id: u64) -> bool {

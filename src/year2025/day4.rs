@@ -2,54 +2,42 @@ use aoc::{IterAdjacent, num_adjacent};
 
 const MAX_ADJACENT: usize = 4;
 
-pub fn run(part: Option<u8>, input: &str) {
-    match part {
-        Some(p) => {
-            if p == 1 {
-                part_one(input);
-            } else {
-                part_two(input);
-            }
-        }
-        None => {
-            part_one(input);
-            part_two(input);
-        }
-    }
-}
+pub struct Solution;
 
-fn part_one(input: &str) {
-    let grid = parse_grid(input);
-    println!(
-        "{}",
-        grid.iter()
-            .enumerate()
-            .map(|(row, tiles)| tiles
-                .iter()
+impl crate::Solution for Solution {
+    fn part_one(input: &str) {
+        let grid = parse_grid(input);
+        println!(
+            "{}",
+            grid.iter()
                 .enumerate()
-                .filter(|&(col, is_roll)| {
-                    *is_roll && num_adjacent(row, col, |t| *t, &grid) < MAX_ADJACENT
-                })
-                .count())
-            .sum::<usize>()
-    );
-}
-
-fn part_two(input: &str) {
-    let mut grid = parse_grid(input);
-    let rows = grid.len();
-    let cols = grid[0].len();
-    let mut sum = 0;
-
-    for row in 0..rows {
-        for col in 0..cols {
-            if grid[row][col] && num_adjacent(row, col, |t| *t, &grid) < MAX_ADJACENT {
-                sum += chain_removals(row, col, &mut grid)
-            }
-        }
+                .map(|(row, tiles)| tiles
+                    .iter()
+                    .enumerate()
+                    .filter(|&(col, is_roll)| {
+                        *is_roll && num_adjacent(row, col, |t| *t, &grid) < MAX_ADJACENT
+                    })
+                    .count())
+                .sum::<usize>()
+        );
     }
 
-    println!("{sum}");
+    fn part_two(input: &str) {
+        let mut grid = parse_grid(input);
+        let rows = grid.len();
+        let cols = grid[0].len();
+        let mut sum = 0;
+
+        for row in 0..rows {
+            for col in 0..cols {
+                if grid[row][col] && num_adjacent(row, col, |t| *t, &grid) < MAX_ADJACENT {
+                    sum += chain_removals(row, col, &mut grid)
+                }
+            }
+        }
+
+        println!("{sum}");
+    }
 }
 
 fn chain_removals(row: usize, col: usize, grid: &mut [Vec<bool>]) -> usize {

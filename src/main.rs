@@ -1,5 +1,5 @@
 use core::panic;
-use std::{env, fs};
+use std::{env, fs, time::Instant};
 
 use clap::Parser;
 use dotenvy::dotenv;
@@ -38,6 +38,41 @@ struct Args {
 
     #[arg(short, long)]
     session_id: Option<String>,
+}
+
+fn time<F>(f: F)
+where
+    F: FnOnce(),
+{
+    let timer = Instant::now();
+    f();
+    eprintln!("took {} μs", timer.elapsed().as_micros());
+}
+
+trait Solution {
+    fn part_one(_: &str) {
+        unimplemented!();
+    }
+
+    fn part_two(_: &str) {
+        unimplemented!();
+    }
+
+    fn run(part: Option<u8>, input: &str) {
+        match part {
+            Some(p) => {
+                if p == 1 {
+                    time(|| Self::part_one(input));
+                } else {
+                    time(|| Self::part_two(input));
+                }
+            }
+            None => {
+                time(|| Self::part_one(input));
+                time(|| Self::part_two(input));
+            }
+        }
+    }
 }
 
 fn main() {
