@@ -1,16 +1,16 @@
 use std::cmp::min;
 
 pub trait NumDigits {
-    fn num_digits(&self) -> u8;
+    fn num_digits(&self, radix: u32) -> u8;
 }
 
 impl NumDigits for u64 {
-    fn num_digits(&self) -> u8 {
-        (self.ilog10() + 1) as u8
+    fn num_digits(&self, radix: u32) -> u8 {
+        (self.ilog(radix as u64) + 1) as u8
     }
 }
 
-pub fn num_adjacent<T, P>(row: usize, col: usize, predicate: P, grid: &[Vec<T>]) -> usize
+pub fn num_adjacent_where<T, P>(row: usize, col: usize, predicate: P, grid: &[Vec<T>]) -> usize
 where
     P: Fn(&T) -> bool,
 {

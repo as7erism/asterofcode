@@ -39,16 +39,16 @@ impl crate::Solution for Solution {
 }
 
 fn is_valid(id: u64) -> bool {
-    !(id.num_digits().is_multiple_of(2)
-        && id / 10_u64.pow((id.num_digits() / 2) as u32)
-            == id % 10_u64.pow((id.num_digits() / 2) as u32))
+    !(id.num_digits(10).is_multiple_of(2)
+        && id / 10_u64.pow((id.num_digits(10) / 2) as u32)
+            == id % 10_u64.pow((id.num_digits(10) / 2) as u32))
 }
 
 fn is_valid_2(id: u64) -> bool {
     // for each factor of this id, chop off that number of digits from the end of a running total
     // and see if each chopped off collection of digits match. if they all do, this is invalid!
-    (0..=(id.num_digits() / 2))
-        .filter(|factor| id.num_digits().is_multiple_of(*factor))
+    (0..=(id.num_digits(10) / 2))
+        .filter(|factor| id.num_digits(10).is_multiple_of(*factor))
         .all(|factor| {
             let rightmost = id % 10_u64.pow(factor as u32);
             let mut state = id / 10_u64.pow(factor as u32);
