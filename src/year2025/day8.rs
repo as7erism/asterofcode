@@ -1,11 +1,13 @@
 pub struct Solution;
 
 impl crate::Solution for Solution {
-    fn part_one(_input: &str) {
+    type OutputOne = usize;
+
+    fn part_one(_input: &str) -> Self::OutputOne {
         todo!();
     }
 
-    fn part_two(_input: &str) {
+    fn part_two(_input: &str) -> Self::OutputTwo {
         todo!();
     }
 }

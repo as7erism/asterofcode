@@ -3,36 +3,32 @@ use aoc::NumDigits;
 pub struct Solution;
 
 impl crate::Solution for Solution {
-    fn part_one(input: &str) {
-        println!(
-            "{}",
-            input
-                .split(',')
-                .flat_map(|range| {
-                    let bounds = range
-                        .split('-')
-                        .map(|id| id.trim().parse::<u64>().unwrap())
-                        .collect::<Vec<u64>>();
-                    (bounds[0]..(bounds[1] + 1)).filter(|id| !is_valid(*id))
-                })
-                .sum::<u64>()
-        );
+    type OutputOne = u64;
+
+    fn part_one(input: &str) -> Self::OutputOne {
+        input
+            .split(',')
+            .flat_map(|range| {
+                let bounds = range
+                    .split('-')
+                    .map(|id| id.trim().parse::<u64>().unwrap())
+                    .collect::<Vec<u64>>();
+                (bounds[0]..(bounds[1] + 1)).filter(|id| !is_valid(*id))
+            })
+            .sum::<u64>()
     }
 
-    fn part_two(input: &str) {
-        println!(
-            "{}",
-            input
-                .split(',')
-                .flat_map(|range| {
-                    let bounds = range
-                        .split('-')
-                        .map(|id| id.trim().parse::<u64>().unwrap())
-                        .collect::<Vec<u64>>();
-                    (bounds[0]..=bounds[1]).filter(|id| !is_valid_2(*id))
-                })
-                .sum::<u64>()
-        );
+    fn part_two(input: &str) -> Self::OutputTwo {
+        input
+            .split(',')
+            .flat_map(|range| {
+                let bounds = range
+                    .split('-')
+                    .map(|id| id.trim().parse::<u64>().unwrap())
+                    .collect::<Vec<u64>>();
+                (bounds[0]..=bounds[1]).filter(|id| !is_valid_2(*id))
+            })
+            .sum::<u64>()
     }
 }
 

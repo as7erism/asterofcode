@@ -3,7 +3,10 @@ use std::{collections::BTreeMap, ops::Bound};
 pub struct Solution;
 
 impl crate::Solution for Solution {
-    fn part_one(input: &str) {
+    type OutputOne = usize;
+    type OutputTwo = u64;
+
+    fn part_one(input: &str) -> Self::OutputOne {
         let mut ranges = BTreeMap::new();
 
         let mut lines = input.lines();
@@ -17,13 +20,10 @@ impl crate::Solution for Solution {
             insert_range(&mut ranges, range.next().unwrap(), range.next().unwrap());
         }
 
-        println!(
-            "{}",
-            lines
-                .map(|id| id.parse::<i64>().unwrap())
-                .filter(|&id| is_in_range(&mut ranges, id))
-                .count()
-        );
+        lines
+            .map(|id| id.parse::<i64>().unwrap())
+            .filter(|&id| is_in_range(&mut ranges, id))
+            .count()
 
         // quadratic solution:
         //let mut ranges = Vec::new();
@@ -38,17 +38,36 @@ impl crate::Solution for Solution {
         //    ranges.push((range_iter.next().unwrap(), range_iter.next().unwrap()));
         //}
         //
-        //println!(
-        //    "{}",
-        //    lines
-        //        .map(|id| id.parse::<u64>().unwrap())
-        //        .filter(|id| ranges.iter().any(|(begin, end)| id >= begin && id <= end))
-        //        .count()
-        //);
+        //lines
+        //    .map(|id| id.parse::<u64>().unwrap())
+        //    .filter(|id| ranges.iter().any(|(begin, end)| id >= begin && id <= end))
+        //    .count()
     }
 
-    fn part_two(input: &str) {
-        let mut range_set = BTreeMap::new();
+    fn part_two(input: &str) -> Self::OutputTwo {
+        //let mut range_set = BTreeMap::new();
+        //
+        //let mut lines = input.lines();
+        //while let Some(line) = lines.next() {
+        //    if line.is_empty() {
+        //        break;
+        //    }
+        //
+        //    let mut range = line.split('-').map(|id| id.parse::<i64>().unwrap());
+        //
+        //    insert_range(&mut range_set, range.next().unwrap(), range.next().unwrap());
+        //}
+        //
+        //range_set
+        //    .iter()
+        //    .map(|(val, marker)| match marker {
+        //        RangeMarker::End => *val,
+        //        RangeMarker::Begin => -val,
+        //    })
+        //    .sum::<i64>() as u64
+
+        // quadratic solution:
+        let mut ranges = Vec::new();
 
         let mut lines = input.lines();
         while let Some(line) = lines.next() {
@@ -56,60 +75,30 @@ impl crate::Solution for Solution {
                 break;
             }
 
-            let mut range = line.split('-').map(|id| id.parse::<i64>().unwrap());
-
-            insert_range(&mut range_set, range.next().unwrap(), range.next().unwrap());
+            let mut range_iter = line.split('-').map(|id| id.parse::<u64>().unwrap());
+            ranges.push((range_iter.next().unwrap(), range_iter.next().unwrap()));
         }
 
-        println!(
-            "{}",
-            range_set
-                .iter()
-                .map(|(val, marker)| {
-                    match marker {
-                        RangeMarker::End => *val,
-                        RangeMarker::Begin => -val,
-                    }
-                })
-                .sum::<i64>()
-        );
+        let num_ranges = ranges.len();
+        let mut skips = vec![false; num_ranges];
+        for i in 0..num_ranges {
+            for j in i + 1..num_ranges {
+                if ranges_overlap(ranges[i], ranges[j]) {
+                    ranges[j] = (
+                        std::cmp::min(ranges[i].0, ranges[j].0),
+                        std::cmp::max(ranges[i].1, ranges[j].1),
+                    );
+                    skips[i] = true;
+                }
+            }
+        }
 
-        // quadratic solution:
-        //let mut ranges = Vec::new();
-        //
-        //let mut lines = input.lines();
-        //while let Some(line) = lines.next() {
-        //    if line.is_empty() {
-        //        break;
-        //    }
-        //
-        //    let mut range_iter = line.split('-').map(|id| id.parse::<u64>().unwrap());
-        //    ranges.push((range_iter.next().unwrap(), range_iter.next().unwrap()));
-        //}
-        //
-        //let num_ranges = ranges.len();
-        //let mut skips = vec![false; num_ranges];
-        //for i in 0..num_ranges {
-        //    for j in i + 1..num_ranges {
-        //        if ranges_overlap(ranges[i], ranges[j]) {
-        //            ranges[j] = (
-        //                std::cmp::min(ranges[i].0, ranges[j].0),
-        //                std::cmp::max(ranges[i].1, ranges[j].1),
-        //            );
-        //            skips[i] = true;
-        //        }
-        //    }
-        //}
-        //
-        //println!(
-        //    "{}",
-        //    ranges
-        //        .iter()
-        //        .enumerate()
-        //        .filter(|&(i, _)| !skips[i])
-        //        .map(|(_, (b, e))| (e - b))
-        //        .sum::<u64>()
-        //);
+        ranges
+            .iter()
+            .enumerate()
+            .filter(|&(i, _)| !skips[i])
+            .map(|(_, (b, e))| (e - b))
+            .sum::<u64>()
     }
 }
 
