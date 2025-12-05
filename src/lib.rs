@@ -74,18 +74,22 @@ where
 pub struct NeighborCoords {
     // TODO space optimize this with i8 offsets
     init_row: usize,
+    init_col: usize,
     current_row: usize,
     row_bound: usize,
-    init_col: usize,
     current_col: usize,
     col_bound: usize,
+    //curr_row_offset: u8,
+    //curr_col_offset: u8,
+    //row_bound_offset: u8,
+    //col_bound_offset: u8,
 }
 
 impl ExactSizeIterator for NeighborCoords {}
 impl FusedIterator for NeighborCoords {}
 
 impl NeighborCoords {
-    pub fn new(init_row: usize, init_col: usize, row_bound: usize, col_bound: usize) -> Self {
+    fn new(init_row: usize, init_col: usize, row_bound: usize, col_bound: usize) -> Self {
         NeighborCoords {
             init_row,
             current_row: init_row.saturating_sub(1),
@@ -96,11 +100,16 @@ impl NeighborCoords {
         }
     }
 
-    // TODO genericize this :3
-    pub fn in_grid<_T>(row: usize, col: usize, grid: &[Vec<_T>]) -> Self {
-        assert!(row < grid.len());
-        assert!(col < grid[0].len());
-        NeighborCoords::new(row, col, grid.len(), grid[0].len())
+    pub fn in_grid<Outer, Inner, _T>(grid: &Outer, row: usize, col: usize) -> Self
+    where
+        Outer: AsRef<[Inner]>,
+        Inner: AsRef<[_T]>,
+    {
+        let rows = grid.as_ref().len();
+        let cols = grid.as_ref()[0].as_ref().len();
+        assert!(row < rows);
+        assert!(col < cols);
+        NeighborCoords::new(row, col, rows, cols)
     }
 
     fn row_lower_bound(&self) -> usize {
@@ -173,15 +182,15 @@ mod tests {
     fn test_yields_expected() {
         let grid = vec![vec![(), (), ()], vec![(), (), ()], vec![(), (), ()]];
 
-        let actual = NeighborCoords::in_grid(1, 0, &grid).collect::<Vec<_>>();
+        let actual = NeighborCoords::in_grid(&grid, 1, 0).collect::<Vec<_>>();
         let expected = vec![(0, 0), (0, 1), (1, 1), (2, 0), (2, 1)];
         assert_eq!(actual, expected);
 
-        let actual = NeighborCoords::in_grid(0, 1, &grid).collect::<Vec<_>>();
+        let actual = NeighborCoords::in_grid(&grid, 0, 1).collect::<Vec<_>>();
         let expected = vec![(0, 0), (0, 2), (1, 0), (1, 1), (1, 2)];
         assert_eq!(actual, expected);
 
-        let actual = NeighborCoords::in_grid(1, 1, &grid).collect::<Vec<_>>();
+        let actual = NeighborCoords::in_grid(&grid, 1, 1).collect::<Vec<_>>();
         let expected = vec![
             (0, 0),
             (0, 1),
@@ -194,11 +203,11 @@ mod tests {
         ];
         assert_eq!(actual, expected);
 
-        let actual = NeighborCoords::in_grid(1, 2, &grid).collect::<Vec<_>>();
+        let actual = NeighborCoords::in_grid(&grid, 1, 2).collect::<Vec<_>>();
         let expected = vec![(0, 1), (0, 2), (1, 1), (2, 1), (2, 2)];
         assert_eq!(actual, expected);
 
-        let actual = NeighborCoords::in_grid(2, 1, &grid).collect::<Vec<_>>();
+        let actual = NeighborCoords::in_grid(&grid, 2, 1).collect::<Vec<_>>();
         let expected = vec![(1, 0), (1, 1), (1, 2), (2, 0), (2, 2)];
         assert_eq!(actual, expected);
 
@@ -211,7 +220,7 @@ mod tests {
             vec![0, 0, 0, 0, 0, 0],
         ];
 
-        let actual = NeighborCoords::in_grid(4, 2, &big_grid).collect::<Vec<_>>();
+        let actual = NeighborCoords::in_grid(&big_grid, 4, 2).collect::<Vec<_>>();
         let expected = vec![
             (3, 1),
             (3, 2),
@@ -236,7 +245,7 @@ mod tests {
             vec![0, 0, 0, 0, 0, 0],
         ];
 
-        let mut iter = NeighborCoords::in_grid(1, 0, &grid);
+        let mut iter = NeighborCoords::in_grid(&grid, 1, 0);
         assert_eq!(iter.len(), 5);
         iter.next();
         assert_eq!(iter.len(), 4);
@@ -250,7 +259,7 @@ mod tests {
         assert_eq!(iter.len(), 0);
         assert_eq!(iter.next(), None);
 
-        let mut iter = NeighborCoords::in_grid(0, 1, &grid);
+        let mut iter = NeighborCoords::in_grid(&grid, 0, 1);
         assert_eq!(iter.len(), 5);
         iter.next();
         assert_eq!(iter.len(), 4);
@@ -264,7 +273,7 @@ mod tests {
         assert_eq!(iter.len(), 0);
         assert_eq!(iter.next(), None);
 
-        let mut iter = NeighborCoords::in_grid(4, 5, &grid);
+        let mut iter = NeighborCoords::in_grid(&grid, 4, 5);
         assert_eq!(iter.len(), 5);
         iter.next();
         assert_eq!(iter.len(), 4);
@@ -278,7 +287,7 @@ mod tests {
         assert_eq!(iter.len(), 0);
         assert_eq!(iter.next(), None);
 
-        let mut iter = NeighborCoords::in_grid(5, 4, &grid);
+        let mut iter = NeighborCoords::in_grid(&grid, 5, 4);
         assert_eq!(iter.len(), 5);
         iter.next();
         assert_eq!(iter.len(), 4);
@@ -292,7 +301,7 @@ mod tests {
         assert_eq!(iter.len(), 0);
         assert_eq!(iter.next(), None);
 
-        let mut iter = NeighborCoords::in_grid(4, 2, &grid);
+        let mut iter = NeighborCoords::in_grid(&grid, 4, 2);
         assert_eq!(iter.len(), 8);
         iter.next();
         assert_eq!(iter.len(), 7);

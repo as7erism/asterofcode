@@ -75,7 +75,8 @@ fn chain_removals(grid: &mut [Vec<bool>], row: usize, col: usize) -> usize {
         0
     } else {
         grid[row][col] = false;
-        1 + NeighborCoords::new(row, col, grid.len(), grid[0].len())
+        let neighbors_iter = NeighborCoords::in_grid(&grid, row, col);
+        1 + neighbors_iter
             .filter_map(|(r, c)| {
                 if grid[r][c] && iter_neighbors(&grid, r, c).filter(|&t| *t).count() < MAX_ADJACENT
                 {
