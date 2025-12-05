@@ -8,14 +8,13 @@ impl crate::Solution for Solution {
             "{}",
             input
                 .split(',')
-                .map(|range| {
+                .flat_map(|range| {
                     let bounds = range
                         .split('-')
                         .map(|id| id.trim().parse::<u64>().unwrap())
                         .collect::<Vec<u64>>();
                     (bounds[0]..(bounds[1] + 1)).filter(|id| !is_valid(*id))
                 })
-                .flatten()
                 .sum::<u64>()
         );
     }
@@ -25,14 +24,13 @@ impl crate::Solution for Solution {
             "{}",
             input
                 .split(',')
-                .map(|range| {
+                .flat_map(|range| {
                     let bounds = range
                         .split('-')
                         .map(|id| id.trim().parse::<u64>().unwrap())
                         .collect::<Vec<u64>>();
                     (bounds[0]..=bounds[1]).filter(|id| !is_valid_2(*id))
                 })
-                .flatten()
                 .sum::<u64>()
         );
     }

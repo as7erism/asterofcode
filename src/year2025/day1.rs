@@ -11,7 +11,7 @@ impl crate::Solution for Solution {
         for line in input.lines() {
             let val = line[1..].parse::<i32>().unwrap();
 
-            if line.chars().next().unwrap() == 'L' {
+            if line.starts_with('L') {
                 sum -= val;
             } else {
                 sum += val;
@@ -33,7 +33,7 @@ impl crate::Solution for Solution {
         for line in input.lines() {
             let val = line[1..].parse::<i32>().unwrap();
 
-            if line.chars().next().unwrap() == 'L' {
+            if line.starts_with('L') {
                 // integer div won't detect the first overflow, so handle it here
                 // also, check if we already hit 0 last time around
                 if sum - val <= 0 && sum != 0 {

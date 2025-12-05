@@ -35,11 +35,12 @@ impl crate::Solution for Solution {
                 if grid[row][col]
                     && iter_neighbors(&grid, row, col).filter(|&t| *t).count() < MAX_ADJACENT
                 {
-                    sum += chain_removals(row, col, &mut grid)
+                    sum += chain_removals(&mut grid, row, col)
                 }
             }
         }
 
+        // multipass solution:
         //let mut grid = parse_grid(input);
         //let rows = grid.len();
         //let cols = grid[0].len();
@@ -49,7 +50,9 @@ impl crate::Solution for Solution {
         //    let mut removed = 0;
         //    for row in 0..rows {
         //        for col in 0..cols {
-        //            if grid[row][col] && num_adjacent_where(row, col, |t| *t, &grid) < MAX_ADJACENT {
+        //            if grid[row][col]
+        //                && iter_neighbors(&grid, row, col).filter(|&t| *t).count() < MAX_ADJACENT
+        //            {
         //                grid[row][col] = false;
         //                removed += 1;
         //            }
@@ -66,15 +69,19 @@ impl crate::Solution for Solution {
     }
 }
 
-fn chain_removals(row: usize, col: usize, grid: &mut [Vec<bool>]) -> usize {
+fn chain_removals(grid: &mut [Vec<bool>], row: usize, col: usize) -> usize {
     if !grid[row][col] {
         0
     } else {
         grid[row][col] = false;
         1 + NeighborCoords::new(row, col, grid.len(), grid[0].len())
             .filter_map(|(r, c)| {
-                (grid[r][c] && iter_neighbors(&grid, r, c).filter(|&t| *t).count() < MAX_ADJACENT)
-                    .then(|| chain_removals(r, c, grid))
+                if grid[r][c] && iter_neighbors(&grid, r, c).filter(|&t| *t).count() < MAX_ADJACENT
+                {
+                    Some(chain_removals(grid, r, c))
+                } else {
+                    None
+                }
             })
             .sum::<usize>()
     }

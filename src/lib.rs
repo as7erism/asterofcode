@@ -1,7 +1,4 @@
-use std::{
-    cmp::min,
-    iter::FusedIterator,
-};
+use std::{cmp::min, iter::FusedIterator};
 
 pub trait NumDigits {
     fn num_digits(&self, radix: u32) -> u8;
@@ -13,17 +10,20 @@ impl NumDigits for u64 {
     }
 }
 
-pub fn iter_neighbors<'a, Outer, Inner: 'a, T: 'a>(
+pub fn iter_neighbors<'a, Outer, Inner, T: 'a>(
     grid: &'a Outer,
     row: usize,
     col: usize,
 ) -> impl Iterator<Item = &'a T>
 where
     Outer: AsRef<[Inner]>,
-    Inner: AsRef<[T]>,
+    Inner: AsRef<[T]> + 'a,
 {
     let rows = grid.as_ref().len();
     let cols = grid.as_ref()[0].as_ref().len();
+    assert!(row < rows);
+    assert!(col < cols);
+
     grid.as_ref()[row.saturating_sub(1)..=min(row + 1, rows - 1)]
         .iter()
         .enumerate()
@@ -31,24 +31,27 @@ where
             tiles.as_ref()[col.saturating_sub(1)..=min(col + 1, cols - 1)]
                 .iter()
                 .enumerate()
-                .filter_map(move |(c, tile)| {
-                    (r + row.saturating_sub(1) != row || c + col.saturating_sub(1) != col)
-                        .then_some(tile)
+                .filter(move |(c, _)| {
+                    r + row.saturating_sub(1) != row || c + col.saturating_sub(1) != col
                 })
+                .map(|(_, tile)| tile)
         })
 }
 
-pub fn iter_neighbors_mut<'a, Outer, Inner: 'a, T: 'a>(
+pub fn iter_neighbors_mut<'a, Outer, Inner, T: 'a>(
     grid: &'a mut Outer,
     row: usize,
     col: usize,
 ) -> impl Iterator<Item = &'a mut T>
 where
     Outer: AsMut<[Inner]>,
-    Inner: AsMut<[T]>,
+    Inner: AsMut<[T]> + 'a,
 {
     let rows = grid.as_mut().len();
     let cols = grid.as_mut()[0].as_mut().len();
+    assert!(row < rows);
+    assert!(col < cols);
+
     grid.as_mut()[row.saturating_sub(1)..=min(row + 1, rows - 1)]
         .iter_mut()
         .enumerate()
@@ -56,10 +59,10 @@ where
             tiles.as_mut()[col.saturating_sub(1)..=min(col + 1, cols - 1)]
                 .iter_mut()
                 .enumerate()
-                .filter_map(move |(c, tile)| {
-                    (r + row.saturating_sub(1) != row || c + col.saturating_sub(1) != col)
-                        .then_some(tile)
+                .filter(move |(c, _)| {
+                    r + row.saturating_sub(1) != row || c + col.saturating_sub(1) != col
                 })
+                .map(|(_, tile)| tile)
         })
 }
 
@@ -69,6 +72,7 @@ where
 /// mutations. it is also [`ExactSizeIterator`].
 #[derive(Debug, Clone)]
 pub struct NeighborCoords {
+    // TODO space optimize this with i8 offsets
     init_row: usize,
     current_row: usize,
     row_bound: usize,
