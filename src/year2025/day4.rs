@@ -1,4 +1,4 @@
-use aoc::{IterAdjacent, num_adjacent_where};
+use aoc::{NeighborCoords, iter_neighbors};
 
 const MAX_ADJACENT: usize = 4;
 
@@ -15,7 +15,9 @@ impl crate::Solution for Solution {
                     .iter()
                     .enumerate()
                     .filter(|&(col, is_roll)| {
-                        *is_roll && num_adjacent_where(row, col, |t| *t, &grid) < MAX_ADJACENT
+                        *is_roll
+                            && iter_neighbors(&grid, row, col).filter(|&t| *t).count()
+                                < MAX_ADJACENT
                     })
                     .count())
                 .sum::<usize>()
@@ -30,11 +32,35 @@ impl crate::Solution for Solution {
 
         for row in 0..rows {
             for col in 0..cols {
-                if grid[row][col] && num_adjacent_where(row, col, |t| *t, &grid) < MAX_ADJACENT {
+                if grid[row][col]
+                    && iter_neighbors(&grid, row, col).filter(|&t| *t).count() < MAX_ADJACENT
+                {
                     sum += chain_removals(row, col, &mut grid)
                 }
             }
         }
+
+        //let mut grid = parse_grid(input);
+        //let rows = grid.len();
+        //let cols = grid[0].len();
+        //let mut sum = 0;
+        //
+        //loop {
+        //    let mut removed = 0;
+        //    for row in 0..rows {
+        //        for col in 0..cols {
+        //            if grid[row][col] && num_adjacent_where(row, col, |t| *t, &grid) < MAX_ADJACENT {
+        //                grid[row][col] = false;
+        //                removed += 1;
+        //            }
+        //        }
+        //    }
+        //    if removed > 0 {
+        //        sum += removed;
+        //    } else {
+        //        break;
+        //    }
+        //}
 
         println!("{sum}");
     }
@@ -45,9 +71,9 @@ fn chain_removals(row: usize, col: usize, grid: &mut [Vec<bool>]) -> usize {
         0
     } else {
         grid[row][col] = false;
-        1 + IterAdjacent::new(row, col, grid.len(), grid[0].len())
+        1 + NeighborCoords::new(row, col, grid.len(), grid[0].len())
             .filter_map(|(r, c)| {
-                (grid[r][c] && num_adjacent_where(r, c, |t| *t, grid) < MAX_ADJACENT)
+                (grid[r][c] && iter_neighbors(&grid, r, c).filter(|&t| *t).count() < MAX_ADJACENT)
                     .then(|| chain_removals(r, c, grid))
             })
             .sum::<usize>()
