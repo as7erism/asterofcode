@@ -1,7 +1,4 @@
-use std::{
-    collections::BTreeMap,
-    ops::Bound,
-};
+use std::{collections::BTreeMap, ops::Bound};
 
 pub struct Solution;
 
@@ -37,9 +34,7 @@ impl crate::Solution for Solution {
         //        break;
         //    }
         //
-        //    let mut range_iter = line
-        //        .split('-')
-        //        .map(|id| id.parse::<u64>().unwrap());
+        //    let mut range_iter = line.split('-').map(|id| id.parse::<u64>().unwrap());
         //    ranges.push((range_iter.next().unwrap(), range_iter.next().unwrap()));
         //}
         //
@@ -88,9 +83,7 @@ impl crate::Solution for Solution {
         //        break;
         //    }
         //
-        //    let mut range_iter = line
-        //        .split('-')
-        //        .map(|id| id.parse::<u64>().unwrap());
+        //    let mut range_iter = line.split('-').map(|id| id.parse::<u64>().unwrap());
         //    ranges.push((range_iter.next().unwrap(), range_iter.next().unwrap()));
         //}
         //
@@ -99,7 +92,10 @@ impl crate::Solution for Solution {
         //for i in 0..num_ranges {
         //    for j in i + 1..num_ranges {
         //        if ranges_overlap(ranges[i], ranges[j]) {
-        //            ranges[j] = (std::cmp::min(ranges[i].0, ranges[j].0), std::cmp::max(ranges[i].1, ranges[j].1));
+        //            ranges[j] = (
+        //                std::cmp::min(ranges[i].0, ranges[j].0),
+        //                std::cmp::max(ranges[i].1, ranges[j].1),
+        //            );
         //            skips[i] = true;
         //        }
         //    }
