@@ -50,13 +50,9 @@ where
 }
 
 trait Solution {
-    fn part_one(_: &str) {
-        unimplemented!();
-    }
+    fn part_one(input: &str);
 
-    fn part_two(_: &str) {
-        unimplemented!();
-    }
+    fn part_two(input: &str);
 
     fn run(part: Option<u8>, input: &str) {
         match part {

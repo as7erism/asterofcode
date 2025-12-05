@@ -42,7 +42,7 @@ impl Iterator for IterAdjacent {
         if self.row == self.row_bound {
             None
         } else if self.col == self.col_bound {
-            self.col = self.init_row.saturating_sub(1);
+            self.col = self.col_lower_bound();
             self.row += 1;
             self.next()
         } else if self.row == self.init_row && self.col == self.init_col {
@@ -54,7 +54,13 @@ impl Iterator for IterAdjacent {
         }
     }
 
-    // TODO make this exact size
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let total = self.rows() * self.cols();
+        let visited = (self.row - self.row_lower_bound()) * self.rows()
+            + (self.col - self.col_lower_bound());
+        if (self.init_row - self.row_lower_bound()) * self.rows() + (self.init_col - self.col_lower_bound()) {};
+        (0, None)
+    }
 }
 
 impl IterAdjacent {
@@ -67,5 +73,21 @@ impl IterAdjacent {
             col: init_col.saturating_sub(1),
             col_bound,
         }
+    }
+
+    fn row_lower_bound(&self) -> usize {
+        self.init_row.saturating_sub(1)
+    }
+
+    fn col_lower_bound(&self) -> usize {
+        self.init_col.saturating_sub(1)
+    }
+
+    fn rows(&self) -> usize {
+        self.row_bound - self.init_row.saturating_sub(1) - 1
+    }
+
+    fn cols(&self) -> usize {
+        self.col_bound - self.init_col.saturating_sub(1) - 1
     }
 }
