@@ -6,7 +6,7 @@ use dotenvy::dotenv;
 
 mod year2025;
 
-const URL: &'static str = "https://adventofcode.com";
+const URL: &str = "https://adventofcode.com";
 
 /// collection of aster's advent of code solutions
 #[derive(Parser, Debug)]
@@ -50,13 +50,9 @@ where
 }
 
 trait Solution {
-    fn part_one(_: &str) {
-        unimplemented!();
-    }
+    fn part_one(input: &str);
 
-    fn part_two(_: &str) {
-        unimplemented!();
-    }
+    fn part_two(input: &str);
 
     fn run(part: Option<u8>, input: &str) {
         match part {
@@ -82,7 +78,7 @@ fn main() {
     let input = if let Some(input) = args.input {
         input
     } else if let Some(path) = args.file {
-        fs::read_to_string(&path).expect(&format!("error reading input file {path}"))
+        fs::read_to_string(&path).unwrap_or_else(|_| panic!("error reading input file {path}"))
     } else {
         let session_id = args.session_id.unwrap_or_else(|| {
             env::var("SESSION_ID").expect("no input given and no session id to fetch input given")
