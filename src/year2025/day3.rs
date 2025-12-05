@@ -3,63 +3,59 @@ const BATTERY_SLOTS: usize = 12;
 pub struct Solution;
 
 impl crate::Solution for Solution {
-    fn part_one(input: &str) {
-        println!(
-            "{}",
-            input
-                .lines()
-                .map(|line| {
-                    let bank = line.chars().collect::<Vec<char>>();
-                    let battery = choose_battery(&bank[..(bank.len() - 1)]);
+    type OutputOne = u32;
+    type OutputTwo = u64;
 
-                    bank[battery].to_digit(10).unwrap() * 10
-                        + bank[(battery + 1)..]
-                            .iter()
-                            .max()
-                            .unwrap()
-                            .to_digit(10)
-                            .unwrap()
-                })
-                .sum::<u32>()
-        );
+    fn part_one(input: &str) -> Self::OutputOne {
+        input
+            .lines()
+            .map(|line| {
+                let bank = line.chars().collect::<Vec<char>>();
+                let battery = choose_battery(&bank[..(bank.len() - 1)]);
+
+                bank[battery].to_digit(10).unwrap() * 10
+                    + bank[(battery + 1)..]
+                        .iter()
+                        .max()
+                        .unwrap()
+                        .to_digit(10)
+                        .unwrap()
+            })
+            .sum::<u32>()
     }
 
-    fn part_two(input: &str) {
-        println!(
-            "{}",
-            input
-                .lines()
-                .map(|line| {
-                    let bank = line.chars().collect::<Vec<char>>();
-                    let mut joltage = String::with_capacity(BATTERY_SLOTS);
-                    let mut i = 0;
+    fn part_two(input: &str) -> Self::OutputTwo {
+        input
+            .lines()
+            .map(|line| {
+                let bank = line.chars().collect::<Vec<char>>();
+                let mut joltage = String::with_capacity(BATTERY_SLOTS);
+                let mut i = 0;
 
-                    // while we still need to pick more batteries from our bank and we have more
-                    // batteries to pick from than battery slots left,
-                    while BATTERY_SLOTS > joltage.len()
-                        && bank[i..].len() > BATTERY_SLOTS - joltage.len()
-                    {
-                        // pick a battery from a range such that even if we pick the last battery in
-                        // the range, there will be enough batteries after to fill all our slots
-                        let battery = choose_battery(
-                            &bank[i..=(bank.len() - (BATTERY_SLOTS - joltage.len()))],
-                        );
+                // while we still need to pick more batteries from our bank and we have more
+                // batteries to pick from than battery slots left,
+                while BATTERY_SLOTS > joltage.len()
+                    && bank[i..].len() > BATTERY_SLOTS - joltage.len()
+                {
+                    // pick a battery from a range such that even if we pick the last battery in
+                    // the range, there will be enough batteries after to fill all our slots
+                    let battery =
+                        choose_battery(&bank[i..=(bank.len() - (BATTERY_SLOTS - joltage.len()))]);
 
-                        joltage.push(bank[i + battery]);
-                        // only search for batteries past this point
-                        i += battery + 1;
-                    }
+                    joltage.push(bank[i + battery]);
+                    // only search for batteries past this point
+                    i += battery + 1;
+                }
 
-                    // if we short-circuited because we couldn't make any more choices, add the rest of
-                    // the batteries to the joltage here
-                    if BATTERY_SLOTS > joltage.len() {
-                        joltage.push_str(&String::from_iter(&bank[i..]));
-                    }
+                // if we short-circuited because we couldn't make any more choices, add the rest of
+                // the batteries to the joltage here
+                if BATTERY_SLOTS > joltage.len() {
+                    joltage.push_str(&String::from_iter(&bank[i..]));
+                }
 
-                    joltage.parse::<u64>().unwrap()
-                })
-                .sum::<u64>()
-        );
+                joltage.parse::<u64>().unwrap()
+            })
+            .sum::<u64>()
     }
 }
 

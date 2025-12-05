@@ -3,7 +3,10 @@ use std::{collections::BTreeMap, ops::Bound};
 pub struct Solution;
 
 impl crate::Solution for Solution {
-    fn part_one(input: &str) {
+    type OutputOne = usize;
+    type OutputTwo = u64;
+
+    fn part_one(input: &str) -> Self::OutputOne {
         let mut ranges = BTreeMap::new();
 
         let mut lines = input.lines();
@@ -17,13 +20,10 @@ impl crate::Solution for Solution {
             insert_range(&mut ranges, range.next().unwrap(), range.next().unwrap());
         }
 
-        println!(
-            "{}",
-            lines
-                .map(|id| id.parse::<i64>().unwrap())
-                .filter(|&id| is_in_range(&mut ranges, id))
-                .count()
-        );
+        lines
+            .map(|id| id.parse::<i64>().unwrap())
+            .filter(|&id| is_in_range(&mut ranges, id))
+            .count()
 
         // quadratic solution:
         //let mut ranges = Vec::new();
@@ -38,16 +38,13 @@ impl crate::Solution for Solution {
         //    ranges.push((range_iter.next().unwrap(), range_iter.next().unwrap()));
         //}
         //
-        //println!(
-        //    "{}",
-        //    lines
-        //        .map(|id| id.parse::<u64>().unwrap())
-        //        .filter(|id| ranges.iter().any(|(begin, end)| id >= begin && id <= end))
-        //        .count()
-        //);
+        //lines
+        //    .map(|id| id.parse::<u64>().unwrap())
+        //    .filter(|id| ranges.iter().any(|(begin, end)| id >= begin && id <= end))
+        //    .count()
     }
 
-    fn part_two(input: &str) {
+    fn part_two(input: &str) -> Self::OutputTwo {
         let mut range_set = BTreeMap::new();
 
         let mut lines = input.lines();
@@ -61,18 +58,13 @@ impl crate::Solution for Solution {
             insert_range(&mut range_set, range.next().unwrap(), range.next().unwrap());
         }
 
-        println!(
-            "{}",
-            range_set
-                .iter()
-                .map(|(val, marker)| {
-                    match marker {
-                        RangeMarker::End => *val,
-                        RangeMarker::Begin => -val,
-                    }
-                })
-                .sum::<i64>()
-        );
+        range_set
+            .iter()
+            .map(|(val, marker)| match marker {
+                RangeMarker::End => *val,
+                RangeMarker::Begin => -val,
+            })
+            .sum::<i64>() as u64
 
         // quadratic solution:
         //let mut ranges = Vec::new();
@@ -101,15 +93,12 @@ impl crate::Solution for Solution {
         //    }
         //}
         //
-        //println!(
-        //    "{}",
-        //    ranges
-        //        .iter()
-        //        .enumerate()
-        //        .filter(|&(i, _)| !skips[i])
-        //        .map(|(_, (b, e))| (e - b))
-        //        .sum::<u64>()
-        //);
+        //ranges
+        //    .iter()
+        //    .enumerate()
+        //    .filter(|&(i, _)| !skips[i])
+        //    .map(|(_, (b, e))| (e - b))
+        //    .sum::<u64>()
     }
 }
 

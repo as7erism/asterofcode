@@ -5,13 +5,14 @@ const MAX_ADJACENT: usize = 4;
 pub struct Solution;
 
 impl crate::Solution for Solution {
-    fn part_one(input: &str) {
+    type OutputOne = usize;
+
+    fn part_one(input: &str) -> Self::OutputOne {
         let grid = parse_grid(input);
-        println!(
-            "{}",
-            grid.iter()
-                .enumerate()
-                .map(|(row, tiles)| tiles
+        grid.iter()
+            .enumerate()
+            .map(|(row, tiles)| {
+                tiles
                     .iter()
                     .enumerate()
                     .filter(|&(col, is_roll)| {
@@ -19,12 +20,12 @@ impl crate::Solution for Solution {
                             && iter_neighbors(&grid, row, col).filter(|&t| *t).count()
                                 < MAX_ADJACENT
                     })
-                    .count())
-                .sum::<usize>()
-        );
+                    .count()
+            })
+            .sum::<usize>()
     }
 
-    fn part_two(input: &str) {
+    fn part_two(input: &str) -> Self::OutputTwo {
         let mut grid = parse_grid(input);
         let rows = grid.len();
         let cols = grid[0].len();
@@ -65,7 +66,7 @@ impl crate::Solution for Solution {
         //    }
         //}
 
-        println!("{sum}");
+        sum
     }
 }
 

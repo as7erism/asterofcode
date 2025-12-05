@@ -4,7 +4,9 @@ const DIAL_LIMIT: i32 = 100;
 pub struct Solution;
 
 impl crate::Solution for Solution {
-    fn part_one(input: &str) {
+    type OutputOne = i32;
+
+    fn part_one(input: &str) -> Self::OutputOne {
         let mut sum = DIAL_START;
         let mut password = 0;
 
@@ -23,10 +25,10 @@ impl crate::Solution for Solution {
             }
         }
 
-        println!("{password}");
+        password
     }
 
-    fn part_two(input: &str) {
+    fn part_two(input: &str) -> Self::OutputTwo {
         let mut sum = DIAL_START;
         let mut password = 0;
 
@@ -48,6 +50,6 @@ impl crate::Solution for Solution {
             sum = sum.rem_euclid(DIAL_LIMIT);
         }
 
-        println!("{password}");
+        password
     }
 }

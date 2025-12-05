@@ -96,10 +96,11 @@ impl NeighborCoords {
         }
     }
 
+    // TODO genericize this :3
     pub fn in_grid<_T>(row: usize, col: usize, grid: &[Vec<_T>]) -> Self {
         assert!(row < grid.len());
         assert!(col < grid[0].len());
-        NeighborCoords::new(row, col, grid.len(), grid[0].len()) // peeking into ur matrix sry
+        NeighborCoords::new(row, col, grid.len(), grid[0].len())
     }
 
     fn row_lower_bound(&self) -> usize {

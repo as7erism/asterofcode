@@ -1,7 +1,13 @@
 #![feature(btree_cursors)]
+#![feature(associated_type_defaults)]
 
 use core::panic;
-use std::{env, fs, time::Instant};
+use std::{
+    env,
+    fmt::Display,
+    fs,
+    time::{Duration, Instant},
+};
 
 use clap::Parser;
 use dotenvy::dotenv;
@@ -42,32 +48,39 @@ struct Args {
     session_id: Option<String>,
 }
 
-fn time<F>(f: F)
+fn time<F, Output>(f: F) -> (Duration, Output)
 where
-    F: FnOnce(),
+    F: FnOnce() -> Output,
 {
     let timer = Instant::now();
-    f();
-    eprintln!("took {} μs", timer.elapsed().as_micros());
+    let val = f();
+    (timer.elapsed(), val)
 }
 
 trait Solution {
-    fn part_one(input: &str);
+    type OutputOne: Display;
+    type OutputTwo: Display = Self::OutputOne;
 
-    fn part_two(input: &str);
+    fn part_one(input: &str) -> Self::OutputOne;
+
+    fn part_two(input: &str) -> Self::OutputTwo;
 
     fn run(part: Option<u8>, input: &str) {
         match part {
             Some(p) => {
                 if p == 1 {
-                    time(|| Self::part_one(input));
+                    let (duration, output) = time(|| Self::part_one(input));
+                    println!("{output}");
+                    eprintln!("took {} μs", duration.as_micros());
                 } else {
-                    time(|| Self::part_two(input));
+                    let (duration, output) = time(|| Self::part_two(input));
+                    println!("{output}");
+                    eprintln!("took {} μs", duration.as_micros());
                 }
             }
             None => {
-                time(|| Self::part_one(input));
-                time(|| Self::part_two(input));
+                Self::run(Some(1), input);
+                Self::run(Some(2), input);
             }
         }
     }
