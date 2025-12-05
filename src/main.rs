@@ -1,3 +1,5 @@
+#![feature(btree_cursors)]
+
 use core::panic;
 use std::{env, fs, time::Instant};
 
