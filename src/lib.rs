@@ -1,4 +1,4 @@
-use std::{cmp::min, iter::FusedIterator};
+use std::{cmp::min, iter::FusedIterator, num::NonZeroUsize};
 
 pub trait NumDigits {
     fn num_digits(&self, radix: u32) -> u8;
@@ -162,6 +162,81 @@ impl Iterator for NeighborCoords {
         } else {
             (total - visited, Some(total - visited))
         }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+struct DisjoinSetsNode {
+    parent_plus_one: Option<NonZeroUsize>,
+    rank: u32,
+}
+
+// TODO maybe reimplement with refcell so api isnt all mutating functions
+#[derive(Debug, Clone)]
+pub struct DisjointSets {
+    nodes: Vec<DisjoinSetsNode>,
+}
+
+impl DisjointSets {
+    pub fn new(size: usize) -> Self {
+        DisjointSets {
+            nodes: vec![Default::default(); size],
+        }
+    }
+
+    /// returns the set representative of `key` if `key` is a member of a set.
+    pub fn find(&mut self, key: usize) -> usize {
+        let mut root = key;
+        while let Some(parent_plus_one) = self.nodes[root].parent_plus_one {
+            root = parent_plus_one.get() - 1;
+        }
+
+        let mut y = key;
+        while y != root {
+            // this is suspect
+            let temp = self.nodes[y];
+            self.nodes[y] = DisjoinSetsNode {
+                parent_plus_one: Some(NonZeroUsize::new(root + 1).unwrap()),
+                rank: temp.rank,
+            };
+            y = temp.parent_plus_one.unwrap().get() - 1;
+        }
+
+        root
+    }
+
+    /// combines the sets that contain `k1` and `k2`.
+    pub fn union(&mut self, k1: usize, k2: usize) -> bool {
+        let r1 = self.find(k1);
+        let r2 = self.find(k2);
+
+        if r1 == r2 {
+            return false;
+        }
+
+        if self.nodes[r1].rank < self.nodes[r2].rank {
+            self.nodes[r1].parent_plus_one = Some(NonZeroUsize::new(r2 + 1).unwrap());
+            if self.nodes[r2].rank == self.nodes[r2].rank {
+                self.nodes[r1].rank += 1;
+            }
+        } else {
+            self.nodes[r2].parent_plus_one = Some(NonZeroUsize::new(r1 + 1).unwrap());
+            if self.nodes[r1].rank == self.nodes[r2].rank {
+                self.nodes[r2].rank += 1;
+            }
+        }
+
+        true
+    }
+
+    pub fn collect(&mut self) -> Vec<Vec<usize>> {
+        let mut sets = vec![vec![]; self.nodes.len()];
+
+        for i in 0..self.nodes.len() {
+            sets[self.find(i)].push(i);
+        }
+
+        sets.into_iter().filter(|set| !set.is_empty()).collect()
     }
 }
 
